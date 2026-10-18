@@ -12,8 +12,8 @@ services:
       - key: NODE_VERSION
         value: "22"
       - key: DATABASE_URL
-        sync: false        # paste the Supabase session pooler string in the dashboard
+        sync: vxkpusbokhagfaqcgmxk       
       - key: JWT_SECRET
         generateValue: true
       - key: CLIENT_ORIGIN
-        sync: false        # the frontend's onrender.com URL, once it exists
+        sync: false       
