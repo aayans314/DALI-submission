@@ -5,6 +5,8 @@ import { query } from './db.js';
 import authRoutes from './routes/auth.js';
 import staffRoutes from './routes/staff.js';
 import shelterRoutes from './routes/shelters.js';
+import personRoutes from './routes/persons.js';
+import duplicateRoutes from './routes/duplicates.js';
 
 const app = express();
 
@@ -36,6 +38,8 @@ app.get('/api/health/db', async (_req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/staff', staffRoutes);
 app.use('/api/shelters', shelterRoutes);
+app.use('/api/persons', personRoutes);
+app.use('/api/duplicates', duplicateRoutes);
 
 app.use('/api', (_req, res) => res.status(404).json({ error: 'Not found.' }));
 

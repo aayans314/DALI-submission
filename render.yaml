@@ -1,4 +1,6 @@
-# Render Blueprint. 
+# Render Blueprint: the API (free web service) and the frontend (free static
+# site, which never sleeps). Secrets use sync: false and are set in the
+# Render dashboard, never in this file: the repo is public.
 services:
   - type: web
     name: reunite-api
@@ -12,8 +14,24 @@ services:
       - key: NODE_VERSION
         value: "22"
       - key: DATABASE_URL
-        sync: vxkpusbokhagfaqcgmxk       
+        sync: vxkpusbokhagfaqcgmxk      
       - key: JWT_SECRET
         generateValue: true
       - key: CLIENT_ORIGIN
-        sync: false       
+        sync: false        # the reunite-web URL, e.g. https://reunite-web.onrender.com
+
+  - type: web
+    name: reunite-web
+    runtime: static
+    rootDir: client
+    buildCommand: npm install --include=dev && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite      # let React handle deep links like /staff/people/12
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: VITE_API_URL
+        sync: false        # the reunite-api URL, e.g. https://reunite-api.onrender.com

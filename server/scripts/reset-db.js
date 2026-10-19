@@ -6,7 +6,7 @@ import bcrypt from 'bcryptjs';
 import { pool } from '../src/db.js';
 import { newReferenceCode } from '../src/lib/refcode.js';
 import { shelters, staff, staffEmail, publicUsers, persons, DEMO_PASSWORD } from '../db/seed-data.js';
-import { nameGroups } from '../db/name-groups.js';
+import { nameIndex } from '../src/lib/names.js';
 import { validateSeed, buildPersonRow } from '../db/build-seed.js';
 
 if (!process.argv.includes('--yes')) {
@@ -62,27 +62,22 @@ try {
   // Persons
   for (const p of persons) {
     const r = buildPersonRow(p, { shelterIds, staffIds });
+    const idx = nameIndex(r.name);
     await client.query(
-      `insert into persons (name, age_min, age_max, home_area, description, is_minor,
-         do_not_disclose, reference_code, current_shelter_id, shelter_history, status,
+      `insert into persons (name, name_norm, name_keys, age_min, age_max, home_area, description,
+         is_minor, do_not_disclose, reference_code, current_shelter_id, shelter_history, status,
          created_by, created_at, updated_at)
-       values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $13)`,
-      [r.name, r.age_min, r.age_max, r.home_area, r.description, r.is_minor,
-        r.do_not_disclose, newReferenceCode(), r.current_shelter_id,
+       values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $15)`,
+      [r.name, idx.norm, idx.keys, r.age_min, r.age_max, r.home_area, r.description,
+        r.is_minor, r.do_not_disclose, newReferenceCode(), r.current_shelter_id,
         JSON.stringify(r.shelter_history), r.status, r.created_by, r.created_at],
     );
-  }
-
-  // Nickname groups
-  for (const [i, group] of nameGroups.entries()) {
-    for (const name of group) {
-      await client.query('insert into name_groups (group_id, name) values ($1, $2)', [i + 1, name]);
-    }
   }
 
   await client.query('commit');
   console.log(`Done: ${shelters.length} shelters, ${staff.length} staff, ${publicUsers.length} public users, ${persons.length} persons.`);
   console.log(`All demo accounts use the password "${DEMO_PASSWORD}".`);
+  console.log('No duplicates are flagged yet: log in as staff and run "Check for duplicates".');
 } catch (err) {
   await client.query('rollback');
   console.error('Reset failed, nothing was changed:', err.message);

@@ -1,10 +1,10 @@
 -- Reunite database schema
 -- Run on a fresh database (scripts/reset-db.js drops everything first).
 
--- Name matching runs entirely inside our own database. No third-party AI.
-create extension if not exists fuzzystrmatch;  -- dmetaphone(), levenshtein()
-create extension if not exists pg_trgm;        -- similarity() for typo tolerance
-create extension if not exists unaccent;       -- "José Hernández" == "Jose Hernandez"
+-- Name matching is done in-house (src/lib/names.js). No third-party AI.
+-- The database only pre-filters candidates: trigram similarity for typos,
+-- and precomputed phonetic/nickname keys.
+create extension if not exists pg_trgm;
 
 -- ---------------------------------------------------------------------------
 -- Shelters
@@ -57,6 +57,8 @@ create table public_users (
 create table persons (
   id                  serial primary key,
   name                text not null,
+  name_norm           text not null,            -- normalized for matching: "jose oneill"
+  name_keys           text[] not null default '{}', -- phonetic + nickname keys
   age_min             int check (age_min is null or age_min between 0 and 120),
   age_max             int check (age_max is null or age_max between 0 and 120),
   home_area           text,
@@ -79,7 +81,8 @@ create table persons (
 );
 
 create index persons_current_shelter_idx on persons (current_shelter_id);
-create index persons_name_trgm_idx on persons using gin (lower(name) gin_trgm_ops);
+create index persons_name_trgm_idx on persons using gin (name_norm gin_trgm_ops);
+create index persons_name_keys_idx on persons using gin (name_keys);
 
 -- ---------------------------------------------------------------------------
 -- Search requests: "I'm looking for someone."
@@ -150,18 +153,6 @@ create table duplicate_flags (
 );
 
 -- ---------------------------------------------------------------------------
--- Name groups: local nickname table (Bob ~ Robert ~ Bobby).
--- A name can belong to several groups ("harry" is in Harold and Henry).
--- ---------------------------------------------------------------------------
-create table name_groups (
-  group_id  int  not null,
-  name      text not null,
-  primary key (group_id, name)
-);
-
-create index name_groups_name_idx on name_groups (name);
-
--- ---------------------------------------------------------------------------
 -- Audit log: who looked at or changed what.
 -- ---------------------------------------------------------------------------
 create table audit_log (
@@ -189,5 +180,4 @@ alter table persons          enable row level security;
 alter table search_requests  enable row level security;
 alter table matches          enable row level security;
 alter table duplicate_flags  enable row level security;
-alter table name_groups      enable row level security;
 alter table audit_log        enable row level security;
