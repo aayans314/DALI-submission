@@ -18,7 +18,7 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: CLIENT_ORIGIN
-        sync: false        # the reunite-web URL, e.g. https://reunite-web.onrender.com
+        sync: false        
 
   - type: web
     name: reunite-web
@@ -34,4 +34,4 @@ services:
       - key: NODE_VERSION
         value: "22"
       - key: VITE_API_URL
-        sync: false        # the reunite-api URL, e.g. https://reunite-api.onrender.com
+        sync: false        
