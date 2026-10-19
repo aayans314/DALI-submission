@@ -16,11 +16,11 @@ The API is on Render's free tier. The first load shows "Starting up" for up to a
 [SEED_SCENARIOS.md](SEED_SCENARIOS.md) walks through the planted cases: a woman registered twice under different names, a husband searched for by a wife with no phone, an abuser searching for someone who asked not to be found, and a child bused from school.
 
 <p>
-<img src="docs/screenshots/checkin-results.png" width="160" alt="Check-in lookup finds an existing record">
-<img src="docs/screenshots/checkin-slip.png" width="160" alt="Reference code slip">
-<img src="docs/screenshots/matches-after.png" width="160" alt="Volunteer confirms a match after asking the person">
-<img src="docs/screenshots/publichome.png" width="160" alt="Family member sees where their mother is">
-<img src="docs/screenshots/duplicates.png" width="160" alt="Merging two records of the same person">
+<img src="reunite/docs/screenshots/checkin-results.png" width="160" alt="Check-in lookup finds an existing record">
+<img src="reunite/docs/screenshots/checkin-slip.png" width="160" alt="Reference code slip">
+<img src="reunite/docs/screenshots/matches-after.png" width="160" alt="Volunteer confirms a match after asking the person">
+<img src="reunite/docs/screenshots/publichome.png" width="160" alt="Family member sees where their mother is">
+<img src="reunite/docs/screenshots/duplicates.png" width="160" alt="Merging two records of the same person">
 </p>
 
 ## The full picture
